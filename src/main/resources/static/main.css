@@ -1,0 +1,41 @@
+.btn-group {
+    margin: auto;
+    width: 90%;
+    padding: 10px;
+    text-align: -webkit-center;
+    border-radius: 25px;
+    padding: 20px;
+    align-items: center;
+}
+
+  .button {
+    text-decoration: none;
+    background-color: #04AA6D;
+    border: 1px solid green;
+    color: white;
+    padding: 10px 24px;
+    cursor: pointer;
+    width: 45%;
+    display: block;
+  }
+
+  .input {
+    text-decoration: none;
+    background-color: #04AA6D;
+    border: 1px solid green;
+    color: white;
+    padding: 10px 24px;
+    cursor: pointer;
+    width: 90%;
+    display: block;
+  }
+
+  div {
+    margin: auto;
+    padding: 10px;
+    width: 30%;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+    text-align: -webkit-center;
+  }
