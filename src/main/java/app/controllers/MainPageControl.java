@@ -68,7 +68,7 @@ public class MainPageControl{
     @PostMapping
     public ModelAndView getChannel(@ModelAttribute ChannelRecived channelRecived, HttpServletRequest req){
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("redirect: login");
+        mav.setViewName("redirect:login");
 
         if(req.getCookies()==null)
         return mav;
@@ -92,6 +92,9 @@ public class MainPageControl{
         return mav;
 
         User user = userService.getUserById(userId);
+        
+        if(user.asUserToSend().getId()==null)
+        return mav;
 
         if(channelRecived == null)
         return mav;
@@ -102,7 +105,7 @@ public class MainPageControl{
         if("".equals(channelRecived.getChannelName()) || 0==channelRecived.getId())
         return mav;
 
-        Channel channel = channelService.getChannelByChannelName(channelRecived.getChannelName());
+        Channel channel = channelService.getChannelById(channelRecived.getId());;
 
         if(!(channel.asChannelToSend().getId()==channelRecived.getId()))
         return mav;
@@ -111,9 +114,9 @@ public class MainPageControl{
             if(!(channel.asChannelToSend().getOwner().getId()==user.asUserToSend().getId()))
                 return mav;
 
-        mav.setViewName("redirect:/channel");
-        mav.addObject("channel", channel.asChannelToSend().getChannelName());
-        mav.addObject("channelId", channel.asChannelToSend().getId());
+        mav.setViewName("redirect:channel");
+        mav.addObject("channelName", channel.asChannelToSend().getChannelName());
+        mav.addObject("id", channel.asChannelToSend().getId());
         return mav;
     }
 

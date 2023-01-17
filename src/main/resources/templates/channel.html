@@ -5,67 +5,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link th:href="@{chat.css}" rel="stylesheet" />
+	<script type="text/javascript" th:src="@{channel.js}"></script>
+
     <title>Document</title>
 </head>
-<body>
-	<h4  th:text="${channel}"></h4>
-<div class="chat">
-    <div class="bubbleWrapper">
-		<div class="inlineContainer">
-			<img class="inlineIcon" src="https://cdn1.iconfinder.com/data/icons/ninja-things-1/1772/ninja-simple-512.png">
-			<div class="otherBubble other">
-				No ninjas!
-			</div>
-		</div><span class="other">08:41</span>
-	</div>
-	<div class="bubbleWrapper">
-		<div class="inlineContainer own">
-			<img class="inlineIcon" src="https://www.pinclipart.com/picdir/middle/205-2059398_blinkk-en-mac-app-store-ninja-icon-transparent.png">
-			<div class="ownBubble own">
-			 The first rule of being a ninja is, 'Do no harm.'
-			</div>
-		</div><span class="own">08:55</span>
-	</div>
-	<div class="bubbleWrapper">
-		<div class="inlineContainer">
-			<img class="inlineIcon" src="https://cdn1.iconfinder.com/data/icons/ninja-things-1/1772/ninja-simple-512.png">
-			<div class="otherBubble other">
-				Knowing when to leave requires training.
-			</div>
-		</div>
-	</div><span class="other">10:13</span>
-	<div class="bubbleWrapper">
-		<div class="inlineContainer own">
-			<img class="inlineIcon" src="https://www.pinclipart.com/picdir/middle/205-2059398_blinkk-en-mac-app-store-ninja-icon-transparent.png">
-			<div class="ownBubble own">
-			Stunned but impressed. 
-			</div>
-		</div><span class="own">11:07</span>
-	</div>
-	<div class="bubbleWrapper">
-		<div class="inlineContainer">
-			<img class="inlineIcon" src="https://cdn1.iconfinder.com/data/icons/ninja-things-1/1772/ninja-simple-512.png">
-			<div class="otherBubble other">
-				How about throwing stars?
-			</div>
-		</div><span class="other">11:11</span>
-	</div>
+<body onload="loadchat(userId, messages)">
+	<h4  th:text="${channelName}"></h4>
+<div class="chat" id="chat">
 </div>
 <div class = "typechat">
-	<form method="post">
-
-		<textarea class = "textarea" name="message" maxlength="200" placeholder="Type your message ..."></textarea><br>
-		<input type="hidden" name="channelId" th:value="${channelId}">
-		<input type="hidden" name="channelName" th:value="${channelName}">
-		<input type="submit" value="Send">
-
-	</form>
+		<textarea class = "textarea" name="message" maxlength="200" placeholder="Type your message ..." id="message"></textarea><br>
+		<input type="submit" value="Send" id="send-button" onclick="SendMessage()">
 </div>
 	<script th:inline="javascript">
 
     	var channelName = /*[[${channelName}]]*/ '';
 		var channelId = /*[[${channelId}]]*/ '';
 		var userName = /*[[${userName}]]*/ '';
+		var userId = /*[[${userId}]]*/ '';
 		var messages = /*[[${messages}]]*/ '';
 
     </script>

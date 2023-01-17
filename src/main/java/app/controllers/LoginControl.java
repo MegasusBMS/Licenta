@@ -27,10 +27,9 @@ class LoginControl{
 
     @PostMapping
     public ModelAndView login(@ModelAttribute UserLogIn userLogIn,HttpServletResponse resp){
-		if(!userService.userLogin(userLogIn))
+		User user = userService.userLogin(userLogIn);
+		if(user.asUserToSend().getId()==null)
 			return new ModelAndView("login");
-
-		User user  = userService.getUserByUserName(userLogIn.getUserName());
 		
 		Cookie cookie = new Cookie("userId", user.asUserToSend().getId()+"");
 		cookie.setMaxAge(60*60*24);
@@ -38,7 +37,7 @@ class LoginControl{
 		cookie.setHttpOnly(true);
 		resp.addCookie(cookie);
 
-		return new ModelAndView("redirect:/mainpage");
+		return new ModelAndView("redirect:mainpage");
 
     }
 

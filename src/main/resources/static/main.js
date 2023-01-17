@@ -17,19 +17,24 @@ function load(channels){
         var form = document.createElement("form");
         form.method="POST"
         
-        var inputChannelName = document.createElement("input");
         var inputChannelId = document.createElement("input");
-
-        inputChannelName.type="submit"
-        inputChannelName.name="channelName"
-        inputChannelName.value=element.channelName
-        inputChannelName.classList.add("input")
-        form.appendChild(inputChannelName);
-
         inputChannelId.type="hidden"
         inputChannelId.name="id"
         inputChannelId.value=element.id
         form.appendChild(inputChannelId);
+
+        var inputChannelName = document.createElement("input");
+        inputChannelName.type="hidden"
+        inputChannelName.name="channelName"
+        inputChannelName.value=element.channelName
+        form.appendChild(inputChannelName);
+
+        var inputChannelName = document.createElement("input");
+        inputChannelName.type="submit"
+        inputChannelName.value=element.channelName
+        inputChannelName.classList.add("input")
+        form.appendChild(inputChannelName);
+
 
         div.appendChild(form);
     });

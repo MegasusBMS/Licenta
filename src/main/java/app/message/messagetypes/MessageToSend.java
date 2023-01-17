@@ -12,8 +12,9 @@ import lombok.Getter;
 public class MessageToSend {
     private Long id;
     private User sender;
+    private String dateOfCreate;
     private Channel channel;
-    private String context;
+    private String rawMessage;
     private Long senderId;
 
     public UserToSend getSender(){

@@ -34,7 +34,7 @@ public class NewChannelControl {
     @PostMapping
     public ModelAndView newChannel(@ModelAttribute ChannelCreated channelCreated, HttpServletRequest req){
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("redirect:/login");
+        mav.setViewName("redirect:login");
         if(req.getCookies()==null)
         return mav;
         
@@ -60,10 +60,13 @@ public class NewChannelControl {
 
         User user = userService.getUserById(userId);
 
+        if(user.asUserToSend().getId()==null)
+        return mav;
+
         Channel channel = new Channel(channelCreated, user);
         channelService.create(channel);
 
-        mav.setViewName("redirect:/mainpage");
+        mav.setViewName("redirect:mainpage");
 
         return mav;
     }

@@ -1,8 +1,11 @@
 package app.user;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import app.user.usertypes.UserLogIn;
@@ -16,9 +19,11 @@ public class UserService {
     @Autowired
     UserRepository userRepo;
 
-    public boolean userLogin(UserLogIn userLogIn) {
-        User user = getUserByUserName(userLogIn.getUserName());
-        return user.passwordEquals(userLogIn.getPassword());
+    public User userLogin(UserLogIn user) {
+        ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreCase().withIgnorePaths("id");
+        Example<User> example = Example.of(new User(user),matcher);
+        Optional<User> optUser= userRepo.findOne(example);
+        return optUser.isPresent() ? optUser.get() : new User();
     }
 
     public boolean SignIn(UserSignIn user) {
@@ -32,31 +37,28 @@ public class UserService {
         return userRepo.findAll().stream().map(User::asUserToSend).toList();
     }
 
-    public User getUserByUserName(String userName){
-        List<User> users = userRepo.findByUserName(userName);
-        return users.size() > 0 ? users.get(0) : new User();
-    }
-
     public User getUserById(long userId) {
         return userRepo.findById(userId).get();
     }
 
     public boolean userExist(User user){
 
-        List<User> users = userRepo.findByUserName(user.asUserToSend().getUserName());
-        return users.size() > 0;
+        return userRepo.findById(user.asUserToSend().getId()).isPresent();
         
     }
 
-    public boolean userExist(String userName){
- 
-        List<User> users = userRepo.findByUserName(userName);
-        return users.size() > 0;
+    public boolean userExist(UserLogIn user){
+        ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreCase().withIgnorePaths("id", "password");
+        Example<User> example = Example.of(new User(user),matcher);
+    
+        return userRepo.findOne(example).isPresent();
     }
 
     public boolean userExist(UserSignIn user){
-        List<User> users = userRepo.findByUserName(user.getUserName());
-        return users.size() > 0;
+        ExampleMatcher matcher = ExampleMatcher.matchingAll().withIgnoreCase().withIgnorePaths("id", "password");
+        Example<User> example = Example.of(new User(user),matcher);
+    
+        return userRepo.findOne(example).isPresent();
     }
 
     public boolean userExist(Long userId){

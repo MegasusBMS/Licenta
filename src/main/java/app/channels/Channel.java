@@ -47,7 +47,7 @@ public class Channel {
     @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "channel",fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.PERSIST,mappedBy = "channel",fetch = FetchType.LAZY)
     private Set<Message> messages;
     
     @ManyToMany(fetch = FetchType.LAZY,cascade = {

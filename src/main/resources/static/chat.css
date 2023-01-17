@@ -16,8 +16,7 @@
     flex-direction: row-reverse;
   }
   .inlineIcon {
-    width:20px;
-    object-fit: contain;
+    color: grey;
   }
   .ownBubble {
       min-width: 60px;
@@ -41,17 +40,36 @@
   }
   .own {
       align-self: flex-end;
+      color: #fff;
   }
   .other {
       align-self: flex-start;
+      color: #fff;
   }
-  span.own,
+  span.own{
+    font-size: 14px;
+    color: grey;
+    margin-left: 85%;
+  }
   span.other{
     font-size: 14px;
     color: grey;
   }
 
+  span.own-username{
+    font-size: 16px;
+    color: grey;
+    margin-left: 85%;
+  }
+
+  span.other-username{
+    font-size: 16px;
+    color: grey;
+    margin-left: -10%;
+  }
+
   .chat {
+    height: 600px;
     margin: auto;
     padding-left: 20%;
     padding-right: 20%;
