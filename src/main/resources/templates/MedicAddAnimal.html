@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body onload="loadData()">
+    <div>
+        Animal: <br><br>
+        <form method="post">
+
+            <label for="numeAnimal">NumeAnimal:</label><br>
+            <input type="text" name="numeAnimal"><br>
+
+            <label for="dataNastere">DataNastere:</label><br>
+            <input type="date" name="dataNastere"><br>
+
+            <label for="cnp">Stapan:</label>
+            <input type="text" name="cnp" list="userList">
+            <datalist id="userList">
+                <option th:each="user : ${users}" th:text="${user.userName}" th:value="${user.cnp}">
+            </datalist>
+
+            <label for="idCategorie">CategorieAnimal:</label><br>
+            <select name="idCategorie" id="animalCategorieSelect" onchange="animalCategorieChanged()">
+            </select>
+
+            <label for="newCategorie" id="newCategorieLabel">Categorie noua:</label><br>
+            <input type="hidden" name="newCategorie" id="newCategorie"><br>
+
+            <label for="idRasa" id="animalRasaLabel">RasaAnimal:</label><br>
+            <select name="idRasa" id="animalRasaSelect" onchange="animalRasaChanged()">
+            </select>
+
+            <label for="newRasa" id="newRasaLabel">Rasa noua:</label><br>
+            <input type="hidden" name="newRasa" id="newRasa"><br>
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+
+        var categorii = JSON.parse(/*[[${categorii}]]*/ '');
+        var rase = JSON.parse(/*[[${rase}]]*/ '');
+
+        function animalCategorieChanged() {
+
+            let animalCategorieSelect = document.getElementById("animalCategorieSelect");
+            let animalCategorieValue = animalCategorieSelect.value;
+
+            let animalRasaSelect = document.getElementById("animalRasaSelect");
+            let animalRasaLabel = document.getElementById("animalRasaLabel");
+
+            let newRasa = document.getElementById("newRasa");
+            let newCategorie = document.getElementById("newCategorie");
+
+            let newRasaLabel = document.getElementById("newRasaLabel");
+            let newCategorieLabel = document.getElementById("newCategorieLabel");
+
+            if (animalCategorieSelect.value == -1) {
+
+                newRasa.type = "text";
+                newCategorie.type = "text";
+                newRasaLabel.style.display = "block";
+                newCategorieLabel.style.display = "block";
+
+                animalRasaSelect.style.display = "none";
+                animalRasaLabel.style.display = "none";
+
+            }
+            else {
+
+                newRasa.type = "hidden";
+                newCategorie.type = "hidden";
+                newRasaLabel.style.display = "none";
+                newCategorieLabel.style.display = "none"
+
+                animalRasaSelect.innerHTML = "";
+                animalRasaSelect.style.display = "block";
+                animalRasaLabel.style.display = "block";
+
+                rase.forEach(rasa => {
+                    if (rasa.idCategorie == animalCategorieValue) {
+                        let option = document.createElement("option");
+                        option.text = rasa.numeRasaAnimal;
+                        option.value = rasa.id;
+                        animalRasaSelect.add(option);
+                    }
+                })
+
+                let option = document.createElement("option");
+                option.text = "Other";
+                option.value = -1;
+                animalRasaSelect.add(option);
+            }
+        }
+
+        function animalRasaChanged() {
+            let animalRasaSelect = document.getElementById("animalRasaSelect");
+
+            let newRasa = document.getElementById("newRasa");
+            let newRasaLabel = document.getElementById("newRasaLabel");
+
+            if (animalRasaSelect.value == -1) {
+                newRasa.type = "text";
+                newRasaLabel.style.display = "block";
+            } else {
+                newRasa.type = "hidden";
+                newRasaLabel.style.display = "none";
+            }
+        }
+
+        function loadData() {
+            let animalCategorieSelect = document.getElementById("animalCategorieSelect");
+
+            categorii.forEach(categorie => {
+
+                let option = document.createElement("option");
+                option.text = categorie.numeCategorie;
+                option.value = categorie.id;
+                animalCategorieSelect.add(option);
+
+            })
+
+            let option = document.createElement("option");
+            option.text = "Other";
+            option.value = -1;
+            animalCategorieSelect.add(option);
+
+            animalCategorieChanged();
+        }
+
+    </script>
+
+</body>
+
+</html>
+
+<style>
+    input[type=text],
+    input[type=number],
+    input[type=date],
+    select,
+    .password {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=button]:hover {
+        background-color: #046288;
+    }
+
+    input[type=submit],
+    input[type=button] {
+        width: 100%;
+        background-color: #117faa;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #046288;
+    }
+
+    div {
+        margin: auto;
+        padding: 10px;
+        width: 25%;
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    a {
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: #117faa;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>

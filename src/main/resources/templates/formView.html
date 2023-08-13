@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormView</title>
+</head>
+
+<body onload="loadData()">
+    <div th:if="${medic != null}">
+        Medic: <br><br>
+        <form method="post">
+
+            <label for="fullName">FullName:</label><br>
+            <input type="text" name="fullName" th:value="${medic.fullName}"><br>
+
+            <label for="idParafa">IdParafa:</label><br>
+            <input type="text" name="idParafa" th:value="${medic.idParafa}"><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" name="password" placeholder="Password" class="password"><br>
+
+            <label for="specializare">Specializare:</label><br>
+            <select type="text" name="idSpecializare" id="specializare">
+                <option th:each="specializare : ${specializari}" th:text="${specializare.numeSpecializare}"
+                    th:value="${specializare.id}"></option>
+            </select>
+
+            <script th:inline="javascript">
+                specializare = document.getElementById("specializare");
+                specializare.value = /*[[${medic.specializare.id}]]*/ 1;
+            </script>
+
+            <input type="hidden" name="id" th:value="${medic.id}">
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+    <div th:if="${animal != null}">
+        Animal: <br><br>
+        <form method="post">
+
+            <label for="numeAnimal">NumeAnimal:</label><br>
+            <input type="text" name="numeAnimal" th:value="${animal.numeAnimal}"><br>
+
+            <label for="dataNastere">DataNastere:</label><br>
+            <input type="date" name="dataNastere" th:value="${dataNastere}"><br>
+
+            <label for="cnp">Stapan:</label>
+            <input type="text" name="cnp" list="userList" id="stapanSelect">
+            <datalist id="userList">
+                <option th:each="user : ${users}" th:text="${user.userName}" th:value="${user.cnp}">
+            </datalist>
+
+            <label for="idCategorie">CategorieAnimal:</label><br>
+            <select name="idCategorie" id="animalCategorieSelect" onchange="animalCategorieChanged()">
+            </select>
+
+            <label for="newCategorie" id="newCategorieLabel">Categorie noua:</label><br>
+            <input type="hidden" name="newCategorie" id="newCategorie"><br>
+
+            <label for="idRasa" id="animalRasaLabel">RasaAnimal:</label><br>
+            <select name="idRasa" id="animalRasaSelect" onchange="animalRasaChanged()">
+            </select>
+
+            <label for="newRasa" id="newRasaLabel">Rasa noua:</label><br>
+            <input type="hidden" name="newRasa" id="newRasa"><br>
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+    <div th:if="${medicament != null}">
+        Medicament: <br><br>
+        <form method="post">
+
+            <label for="numeMedicament">NumeMedicament:</label><br>
+            <input type="text" name="numeMedicament" th:value="${medicament.nume}"><br>
+
+            <input type="hidden" name="id" th:value="${medicament.id}">
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+    <div th:if="${tratament != null}">
+        Rasa: <br><br>
+        <form method="post">
+
+            <label for="numeAnimal">Animal:</label><br>
+            <input type="text" name="numeAnimal" th:value="${tratament.animal.numeAnimal}"><br>
+
+            <label for="pretManopera">PretManopera</label>
+            <input type="number" name="pretManopera"><br>
+
+            <label for="numeMedic">Medic:</label><br>
+            <input type="text" name="numeTratament" th:value="${tratament.medic.fullName}"><br>
+
+            <input type="hidden" name="id" th:value="${tratament.id}">
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+    <div th:if="${utilizator != null}">
+        User: <br><br>
+        <form method="POST">
+
+            <label for="userName">NumeUtilizator:</label><br>
+            <input type="text" name="userName" th:value="${utilizator.userName}"><br>
+
+            <label for="cnp">CNP:</label><br>
+            <input type="number" name="cnp" th:value="${utilizator.cnp}"><br>
+
+            <label for="password">Password:</label><br>
+            <input type="password" name="password" placeholder="New Password" class="password"><br>
+
+            <input type="hidden" name="UUID" th:value="${utilizator.UUID}">
+
+            <input type="submit" value="Submit">
+
+        </form>
+    </div>
+</body>
+
+<script th:inline="javascript" th:if="${animal != null}">
+
+    var categorii = JSON.parse(/*[[${categorii}]]*/ '');
+    var rase = JSON.parse(/*[[${rase}]]*/ '');
+    var categorieId = /*[[${animal.rasa.categorieAnimal.id}]]*/ 0;
+    var rasaId = /*[[${animal.rasa.id}]]*/ 0;
+    var cnp = /*[[${animal.stapan.cnp}]]*/ 0;
+
+    function animalCategorieChanged() {
+
+        let animalCategorieSelect = document.getElementById("animalCategorieSelect");
+        let animalCategorieValue = animalCategorieSelect.value;
+
+        let animalRasaSelect = document.getElementById("animalRasaSelect");
+        let animalRasaLabel = document.getElementById("animalRasaLabel");
+
+        let newRasa = document.getElementById("newRasa");
+        let newCategorie = document.getElementById("newCategorie");
+
+        let newRasaLabel = document.getElementById("newRasaLabel");
+        let newCategorieLabel = document.getElementById("newCategorieLabel");
+
+        if (animalCategorieSelect.value == -1) {
+
+            newRasa.type = "text";
+            newCategorie.type = "text";
+            newRasaLabel.style.display = "block";
+            newCategorieLabel.style.display = "block";
+
+            animalRasaSelect.style.display = "none";
+            animalRasaLabel.style.display = "none";
+
+        }
+        else {
+
+            newRasa.type = "hidden";
+            newCategorie.type = "hidden";
+            newRasaLabel.style.display = "none";
+            newCategorieLabel.style.display = "none"
+
+            animalRasaSelect.innerHTML = "";
+            animalRasaSelect.style.display = "block";
+            animalRasaLabel.style.display = "block";
+
+            rase.forEach(rasa => {
+                if (rasa.idCategorie == animalCategorieValue) {
+                    let option = document.createElement("option");
+                    option.text = rasa.numeRasaAnimal;
+                    option.value = rasa.id;
+                    animalRasaSelect.add(option);
+                }
+            })
+
+            let option = document.createElement("option");
+            option.text = "Other";
+            option.value = -1;
+            animalRasaSelect.add(option);
+        }
+    }
+
+    function animalRasaChanged() {
+        let animalRasaSelect = document.getElementById("animalRasaSelect");
+
+        let newRasa = document.getElementById("newRasa");
+        let newRasaLabel = document.getElementById("newRasaLabel");
+
+        if (animalRasaSelect.value == -1) {
+            newRasa.type = "text";
+            newRasaLabel.style.display = "block";
+        } else {
+            newRasa.type = "hidden";
+            newRasaLabel.style.display = "none";
+        }
+    }
+
+    function loadData() {
+        let animalCategorieSelect = document.getElementById("animalCategorieSelect");
+
+        categorii.forEach(categorie => {
+
+            let option = document.createElement("option");
+            option.text = categorie.numeCategorie;
+            option.value = categorie.id;
+            animalCategorieSelect.add(option);
+
+        })
+
+        let option = document.createElement("option");
+        option.text = "Other";
+        option.value = -1;
+        animalCategorieSelect.add(option);
+
+        animalCategorieChanged();
+
+        animalCategorieSelect.value = categorieId;
+        document.getElementById("animalRasaSelect").value = rasaId;
+        document.getElementById("stapanSelect").value = cnp;
+    }
+
+</script>
+
+</html>
+<style>
+    input[type=text],
+    input[type=date],
+    input[type=number],
+    select,
+    .password {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #45a049;
+    }
+
+    div {
+        margin: auto;
+        padding: 10px;
+        width: 25%;
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    a {
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>

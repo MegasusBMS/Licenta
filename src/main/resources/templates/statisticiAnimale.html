@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistici</title>
+</head>
+
+<body onload="onLoad()">
+    <script src="https://unpkg.com/jspdf-invoice-template@1.4.0/dist/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="container">
+        <div class="form-container">
+
+            <label for="categorie">
+                <button class="back-button" th:onclick="|window.location.href='@{'/app/medic'}'|">Back</button>
+            </label>
+            <label for="categorie">Grupare:</label>
+            <select id="groupBy" name="categorie">
+                <option value="categorieAnimal">Specii - Animale</option>
+                <option value="rasa">Rase - Animale</option>
+                <option value="varsta">Varste - Animale</option>
+                <option value="diagnostic">Diagnostice - Diagnostice</option>
+                <option value="categorieDiagnostic">Categorii - Diagnostice</option>
+                <option value="diagnostic-luna">Luni - Diagnostice</option>
+                <option value="diagnostic-an">Ani - Diagnostice</option>
+                <option value="tratament-luna">Luni - Tratamente</option>
+                <option value="tratament-an">Ani - Tratamente</option>
+                <option value="medic">Medici - Tratamente</option>
+                <option value="medicament">Medicamente - Medicamente</option>
+                <option value="medicament-luna">Luni - Medicamente</option>
+                <option value="medicament-an">Ani - Medicamente</option>
+            </select>
+
+            <label for="rase" class="count_selected" id="countRase">0</label>
+            <label for="rase">Rase:</label>
+            <select id="rase" name="rase" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countRase'))">
+                <option th:each="rase : ${rase}" th:value="${rase.id}" th:text="${rase.numeRasa}"></option>
+            </select>
+
+            <label for="specii" class="count_selected" id="countSpecii">0</label>
+            <label for="specii">Specii:</label>
+            <select id="specii" name="specii" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countSpecii'))">
+                <option th:each="specie : ${specii}" th:value="${specie.id}" th:text="${specie.numeCategorie}">
+                </option>
+            </select>
+
+            <label for="diagnostice" class="count_selected" id="countDiagnostice">0</label>
+            <label for="diagnostice">Diagnostice:</label>
+            <select id="diagnostice" name="diagnostice" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countDiagnostice'))">
+                <option th:each="diagnostic : ${diagnostice}" th:value="${diagnostic.id}"
+                    th:text="${diagnostic.numeCategorieDiagnostic}"></option>
+            </select>
+
+            <label for="medicamente" class="count_selected" id="countMedicamente">0</label>
+            <label for="medicamente">Medicamente:</label>
+            <select id="medicamente" name="medicamente" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countMedicamente'))">
+                <option th:each="medicament : ${medicamente}" th:value="${medicament.id}" th:text="${medicament.nume}">
+                </option>
+            </select>
+
+            <label for="specializari" class="count_selected" id="countSpecializari">0</label>
+            <label for="specializari">Specializari:</label>
+            <select id="specializari" name="specializari" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countSpecializari'))">
+                <option th:each="specializare : ${specializari}" th:value="${specializare.id}"
+                    th:text="${specializare.numeSpecializare}"></option>
+            </select>
+
+            <label for="medici" class="count_selected" id="countMedici">0</label>
+            <label for="medici">Medici:</label>
+            <select id="medici" name="medici" multiple size="4"
+                onchange="updateCount(this, document.getElementById('countMedici'))">
+                <option th:each="medic : ${medici}" th:value="${medic.id}" th:text="${medic.fullName}"></option>
+            </select>
+
+            <label for="dateLocation">Data dupa:</label>
+            <select id="dateLocation" name="dateLocation">
+                <option value="tratament">Data Tratament</option>
+                <option value="diagnostic">Data Diagnostic</option>
+                <option value="noDate">NoDateFilter</option>
+            </select>
+
+            <label for="startDate">De la:</label>
+            <input type="date" name="startDate" id="startDate" th:value="${firstDayOfYear}">
+            <label for="endDate">Pana la:</label>
+            <input type="date" name="endDate" id="endDate" th:value="${now}">
+
+            <input type="submit" id="submit" onclick="request()">
+            <button onclick="more.showModal()">More...</button>
+            <dialog id="more" style="width: 10%">
+                <div class="button-group">
+                    <button id="closeButton" onclick="more.close()" class="close-button">&times;</button>
+                    <h4>Options:</h4>
+                    <button onclick="prognozareDialog.showModal();more.close()" style="float:right">Prognozare</button>
+                    <button onclick="medieDialog.showModal();more.close()" style="float:right">Medie</button>
+                    <button onclick="totalDialog.showModal();more.close()" style="float:right">Total</button>
+                    <br>
+                    <br>
+                    <h4>Save As PDF:</h4>
+                    <button onclick="pdfDialog.showModal();more.close()">SaveAsPDF</button>
+                </div>
+            </dialog>
+            <dialog id="totalDialog">
+                <button id="closeButton" onclick="totalDialog.close()" class="close-button">&times;</button>
+                <br>
+                <h2>Total</h2>
+                <br>
+                <label for="totalAparitii">
+                    <input type="checkbox" id="totalAparitii" checked> Total Aparitii
+                </label>
+                <label>
+                    <input type="checkbox" id="totalEsantion" checked> Total Esantion
+                </label>
+                <label>
+                    <input type="checkbox" id="totalPerioada" checked> Total din Total In Perioada
+                </label>
+                <label>
+                    <input type="checkbox" id="totalProcentaj" checked> Total din Total
+                </label>
+                <label for="totalManopere">
+                    <input type="checkbox" id="totalManopere" checked> Total Valoare Manopere
+                </label>
+                <label for="totalMedicamente">
+                    <input type="checkbox" id="totalMedicamente" checked> Total Valoare Medicamente
+                </label>
+                <button
+                    onclick="totalDialog.close();if(totalAparitii.checked || totalEsantion.checked || totalPerioada.checked || totalProcentaj.checked || totalManopere.checked || totalMedicamente.checked) calTotal();">
+                    Execute </button>
+
+            </dialog>
+            <dialog id="medieDialog">
+                <button id="closeButton" onclick="medieDialog.close()" class="close-button">&times;</button>
+                <br>
+                <h2>Medie</h2>
+                <br>
+                <label for="medieAparitii">
+                    <input type="checkbox" id="medieAparitii" checked> Medie Aparitii
+                </label>
+                <label for="medieManopere">
+                    <input type="checkbox" id="medieManopere" checked> Medie Valoare Manopere
+                </label>
+                <label for="medieMedicamente">
+                    <input type="checkbox" id="medieMedicamente" checked> Medie Valoare Medicamente
+                </label>
+                <button
+                    onclick="medieDialog.close();if(medieAparitii.checked || medieManopere.checked || medieMedicamente.checked) medie();">
+                    Execute </button>
+
+            </dialog>
+            <dialog id="prognozareDialog">
+                <button id="closeButton" onclick="prognozareDialog.close()" class="close-button">&times;</button>
+                <br>
+                <h2>Prognozare</h2>
+                <br>
+                <label for="alpha">Coeficient de Nivelare</label>
+                <input type="number" id="alpha" name="alpha" step="0.1" min="0.01" max="0.99" value="0.3"
+                    onchange="validateInput(this)" />
+                <script>
+                    function validateInput(input) {
+                        if (input.value < input.min) {
+                            input.value = input.min;
+                        }
+                        if (input.value > input.max) {
+                            input.value = input.max;
+                        }
+                    }
+                </script>
+
+                <label for="progAparitii">
+                    <input type="checkbox" id="progAparitii" checked> Prognozare Aparitii
+                </label>
+                <label for="progManopere">
+                    <input type="checkbox" id="progManopere" checked> Prognozare Valoare Manopere
+                </label>
+                <label for="progMedicamente">
+                    <input type="checkbox" id="progMedicamente" checked> Prognozare Valoare Medicamente
+                </label>
+                <button
+                    onclick="prognozareDialog.close();if(progAparitii.checked || progManopere.checked || progMedicamente.checked) prognozare();">
+                    Execute </button>
+            </dialog>
+            <dialog id="pdfDialog">
+                <button id="closeButton" onclick="pdfDialog.close()" class="close-button">&times;</button>
+                <h2>Generate PDF</h2>
+                <label for="raportName">Raport Name:</label>
+                <input type="text" id="raportName">
+
+                <label for="showGrupare">
+                    <input type="checkbox" id="showGroupBy"> Vizibilitate Grupare
+                </label>
+                <label for="showFilters">
+                    <input type="checkbox" id="showFilters"> Vizibilitate Filtre
+                </label>
+
+                <h4>Coloane: </h4>
+                <label>
+                    <input type="checkbox" id="ckC1" checked> Aparitii
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC2" checked> Procentaj Esantion
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC3" checked> Procentaj Total In Perioada
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC4" checked> Procentaj Total
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC5" checked> Valoare Manopere
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC6" checked> Valoare Medicamente
+                </label>
+                <label>
+                    <input type="checkbox" id="ckC7" checked> Valoare Totala
+                </label>
+
+                <button onclick="pdfDialog.close(); createPDF();">Create PDF</button>
+                <button onclick="pdfDialog.close();">Close</button>
+            </dialog>
+        </div>
+        <div class="table-container">
+            <table th:if="${not #lists.isEmpty(statistici)}">
+                <thead>
+                    <tr>
+                        <th>Grupare</th>
+                        <th>Aparitii <input type="checkbox" id="ckAparitii" name="myCheckbox" checked
+                                onchange=" chartsApariti.style.display = ckAparitii.checked ? 'flex' : 'none'; tc1.style.display = ckAparitii.checked ? 'flex' : 'none'; if(ckAparitii.checked){myPieChart.update();myBarChart.update()}" />
+                        </th>
+                        <th>Procentaj Esantion</th>
+                        <th>Procentaj Total In Perioada</th>
+                        <th>Procentaj Total</th>
+                        <th>Valoare Manopere <input type="checkbox" id="ckValManopere"
+                                onchange=" chartsManopere.style.display = ckValManopere.checked ? 'flex' : 'none'; tc2.style.display = ckValManopere.checked ? 'flex' : 'none'; if(ckValManopere.checked){myPieChartValManopere.update();myBarChartValManopere.update()}" />
+                        </th>
+                        <th>Valoare Medicamente <input type="checkbox" id="ckValMedicamente"
+                                onchange=" chartsMedicamente.style.display = ckValMedicamente.checked ? 'flex' : 'none';tc3.style.display = ckValMedicamente.checked ? 'flex' : 'none'; if(ckValMedicamente.checked){myPieChartValMedicamente.update();myBarChartValMedicamente.update()}" />
+                        </th>
+                        <th>Valoare Totala <input type="checkbox" id="ckValTotala"
+                                onchange=" chartsTotal.style.display = ckValTotala.checked ? 'flex' : 'none'; tc4.style.display = ckValTotala.checked ? 'flex' : 'none'; if(ckValTotala.checked){myPieChartValTotal.update();myBarChartValTotal.update()}" />
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tb">
+                    <tr th:each="element : ${statistici.listaStatistici}">
+                        <td th:text="${element.grupa}"></td>
+                        <td th:text="${element.aparitie}"></td>
+                        <td th:text="${procentFormat.format(element.procentajEsantion)}"></td>
+                        <td th:text="${procentFormat.format(element.procentajTotalPerioada)}"></td>
+                        <td th:text="${procentFormat.format(element.procentajTotal)}"></td>
+                        <td th:text="${curencyFormat.format(element.valoareManopere)}"></td>
+                        <td th:text="${curencyFormat.format(element.valoareTratamente)}"></td>
+                        <td th:text="${curencyFormat.format(element.valoareTotala)}"></td>
+                    </tr>
+                    <tr id="total" class="nonDataRow">
+                        <td class="cellWithButton">Total <button id="closeButton" onclick="deleteRow(this)"
+                                class="close-button">&times;</button></td>
+                        <td th:text="${statistici.aparitieSum}"></td>
+                        <td th:text="${procentFormat.format(statistici.procentajEsantionSum)}"></td>
+                        <td th:text="${procentFormat.format(statistici.procentajTotalPerioadaSum)}"></td>
+                        <td th:text="${procentFormat.format(statistici.procentajTotalSum)}"></td>
+                        <td th:text="${curencyFormat.format(statistici.valoareManopereSum)}"></td>
+                        <td th:text="${curencyFormat.format(statistici.valoareTratamenteSum)}"></td>
+                        <td th:text="${curencyFormat.format(statistici.valoareTotalaSum)}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3 class="chartTitle" id="tc1">Grafice Aparitii:</h3>
+            <div class="charts" id="chartsApariti">
+                <div class="pieChart">
+                    <canvas id="pie"></canvas>
+                </div>
+                <div class="barChart">
+                    <canvas id="bar"></canvas>
+                </div>
+            </div>
+            <h3 class="chartTitle" id="tc2" style="display: none;">Grafice Valori Manopere:</h3>
+            <div class="charts" id="chartsManopere" style="display: none;">
+                <div class="pieChart">
+                    <canvas id="pieValManopere"></canvas>
+                </div>
+                <div class="barChart">
+                    <canvas id="barValManopere"></canvas>
+                </div>
+            </div>
+            <h3 class="chartTitle" id="tc3" style="display: none;">Grafice Valori Medicamente:</h3>
+            <div class="charts" id="chartsMedicamente" style="display: none;">
+                <div class="pieChart">
+                    <canvas id="pieValMedicamente"></canvas>
+                </div>
+                <div class="barChart">
+                    <canvas id="barValMedicamente"></canvas>
+                </div>
+            </div>
+            <h3 class="chartTitle" id="tc4" style="display: none;">Grafice Valori Totale:</h3>
+            <div class="charts" id="chartsTotal" style="display: none;">
+                <div class="pieChart">
+                    <canvas id="pieValTotal"></canvas>
+                </div>
+                <div class="barChart">
+                    <canvas id="barValTotal"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+
+        var labels = [];
+        var values = [];
+        var valuesManopere = [];
+        var valuesMedicamente = [];
+        var valuesTotal = [];
+
+        var countNoData = 1;
+
+        var colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#8B4513', '#FF9800'];
+
+        var totalRow = document.getElementById("total");
+
+        var ctx = document.getElementById('pie').getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctx = document.getElementById('bar').getContext('2d');
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValManopere = document.getElementById('pieValManopere').getContext('2d');
+        var myPieChartValManopere = new Chart(ctxValManopere, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesManopere,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValManopere = document.getElementById('barValManopere').getContext('2d');
+        var myBarChartValManopere = new Chart(ctxValManopere, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesManopere,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValMedicamente = document.getElementById('pieValMedicamente').getContext('2d');
+        var myPieChartValMedicamente = new Chart(ctxValMedicamente, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesMedicamente,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValMedicamente = document.getElementById('barValMedicamente').getContext('2d');
+        var myBarChartValMedicamente = new Chart(ctxValMedicamente, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesMedicamente,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValTotal = document.getElementById('pieValTotal').getContext('2d');
+        var myPieChartValTotal = new Chart(ctxValTotal, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesTotal,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctxValTotal = document.getElementById('barValTotal').getContext('2d');
+        var myBarChartValTotal = new Chart(ctxValTotal, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valuesTotal,
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            fontSize: 12,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function deleteRow(button) {
+            var row = button.parentNode.parentNode;
+            row.remove();
+            countNoData--;
+        }
+
+        function calTotal() {
+            let tbody = document.getElementById("tb");
+            let clone = totalRow.cloneNode(true);
+
+            const ck1 = totalAparitii.checked;
+            const ck2 = totalEsantion.checked
+            const ck3 = totalPerioada.checked
+            const ck4 = totalProcentaj.checked
+            const ck5 = totalManopere.checked;
+            const ck6 = totalMedicamente.checked;
+
+            if (!ck1)
+                clone.cells[1].innerHTML = '-';
+            if (!ck2)
+                clone.cells[2].innerHTML = '-';
+            if (!ck3)
+                clone.cells[3].innerHTML = '-';
+            if (!ck4)
+                clone.cells[4].innerHTML = '-';
+            if (!ck5)
+                clone.cells[5].innerHTML = '-';
+            if (!ck6)
+                clone.cells[6].innerHTML = '-';
+            if (!ck6 || !ck5)
+                clone.cells[7].innerHTML = '-';
+
+            tbody.appendChild(clone);
+            countNoData++;
+        }
+
+        function medie() {
+            let tbody = document.getElementById("tb");
+            let rows = tbody.querySelectorAll('tr');
+
+            data1 = [];
+            data2 = [];
+            data3 = [];
+
+            rows.forEach(row => {
+                if (!row.classList.contains("nonDataRow")) {
+                    let columns = row.querySelectorAll('td');
+
+                    let key = columns[0].textContent.trim();
+                    let value1 = columns[1].textContent.trim();
+                    let value2 = columns[5].textContent.trim();
+                    let value3 = columns[6].textContent.trim();
+                    data1.push(value1);
+                    data2.push(parseFloat(value2));
+                    data3.push(parseFloat(value3));
+                }
+            });
+            const sum1 = data1.reduce((total, num) => total + parseFloat(num), 0);
+            const sum2 = data2.reduce((total, num) => total + parseFloat(num), 0);
+            const sum3 = data3.reduce((total, num) => total + parseFloat(num), 0);
+
+            const average1 = sum1 / data1.length;
+            const average2 = sum2 / data2.length;
+            const average3 = sum3 / data3.length;
+
+
+            let newRow = document.createElement('tr');
+            const ck1 = medieAparitii.checked;
+            const ck2 = medieManopere.checked;
+            const ck3 = medieMedicamente.checked;
+            let count = 0;
+
+            let cell = document.createElement('td');
+            cell.textContent = "Medie";
+            cell.classList.add("cellWithButton");
+            let closeBtn = document.createElement("button");
+            closeBtn.innerHTML = "&times;";
+            closeBtn.id = "closeButton";
+            closeBtn.classList.add("close-button");
+            closeBtn.addEventListener("click", function () {
+                deleteRow(closeBtn);
+            });
+            cell.appendChild(closeBtn);
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = ck1 ? parseFloat(average1.toFixed(2)) : "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = ck2 ? average2.toFixed(2) : "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = ck3 ? average3.toFixed(2) : "-";
+            newRow.appendChild(cell);
+
+            cell = document.createElement('td');
+            cell.textContent = ck2 && ck3 ? (average2 + average3).toFixed(2) : "-";
+            newRow.appendChild(cell);
+
+            newRow.classList.add("nonDataRow");
+
+            tbody.appendChild(newRow);
+            countNoData++;
+
+        }
+
+        function prognozare() {
+            let dataList = []
+
+            let tbody = document.getElementById("tb");
+            let rows = tbody.querySelectorAll('tr');
+
+
+            if (rows.length < 2) {
+                alert("Nu sunt suficiente date!");
+                return;
+            }
+
+            let data1 = {};
+            let data2 = {};
+            let data3 = {};
+
+            rows.forEach(row => {
+                if (!row.classList.contains("nonDataRow")) {
+                    let columns = row.querySelectorAll('td');
+
+                    let key = columns[0].textContent.trim();
+                    let value1 = columns[1].textContent.trim();
+                    let value2 = columns[5].textContent.trim();
+                    let value3 = columns[6].textContent.trim();
+                    data1[key] = value1;
+                    data2[key] = parseFloat(value2);
+                    data3[key] = parseFloat(value3);
+                }
+            });
+
+            if (progAparitii.checked)
+                dataList.push(data1);
+            if (progManopere.checked)
+                dataList.push(data2);
+            if (progMedicamente)
+                dataList.push(data3)
+
+            let obj = { alpha: document.getElementById("alpha").value, data: dataList }
+
+            fetch('api/statistici/prognoza', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(obj)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error('Error: ' + response.status);
+                    }
+                })
+                .then(result => {
+                    result = JSON.parse(result);
+
+                    let newRow = document.createElement('tr');
+                    const ck1 = progAparitii.checked;
+                    const ck2 = progManopere.checked;
+                    const ck3 = progMedicamente.checked;
+                    let count = 0;
+
+                    let cell = document.createElement('td');
+                    cell.textContent = "Prognozare - " + document.getElementById("alpha").value;
+                    cell.classList.add("cellWithButton");
+                    let closeBtn = document.createElement("button");
+                    closeBtn.innerHTML = "&times;";
+                    closeBtn.id = "closeButton";
+                    closeBtn.classList.add("close-button");
+                    closeBtn.addEventListener("click", function () {
+                        deleteRow(closeBtn);
+                    });
+                    cell.appendChild(closeBtn);
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = ck1 ? parseFloat(result[count++].toFixed(2)) : "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = ck2 ? result[count++].toLocaleString('ro-RO', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + "RON" : "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = ck3 ? result[count++].toLocaleString('ro-RO', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + "RON" : "-";
+                    newRow.appendChild(cell);
+
+                    cell = document.createElement('td');
+                    cell.textContent = ck2 && ck3 ? (parseFloat(result[--count]) + parseFloat(result[--count])).toLocaleString('ro-RO', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + "RON" : "-";
+                    newRow.appendChild(cell);
+
+                    newRow.classList.add("nonDataRow");
+
+                    tbody.appendChild(newRow);
+                    countNoData++;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        function createPDF() {
+
+            let table = document.getElementById("tb");
+
+            var matrix = [];
+
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                const rowData = [];
+
+                for (let j = 0; j < cells.length; j++) {
+
+                    const cell = cells[j];
+
+                    if (cell.childElementCount > 0) {
+                        const copy = cell.cloneNode(true);
+                        copy.lastChild.remove();
+                        rowData.push(copy.innerText);
+                    } else {
+                        rowData.push(cell.innerText);
+                    }
+                }
+
+                matrix.push(rowData);
+            }
+
+            let filtre = ""
+            if (Array.from(rase.selectedOptions).length > 0) {
+                filtre += "\tRase: ";
+                Array.from(rase.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+                filtre += "\n";
+            }
+
+            if (Array.from(specii.selectedOptions).length > 0) {
+                filtre += "\tSpecii: ";
+                Array.from(specii.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+                filtre += "\n";
+            }
+
+
+            if (Array.from(diagnostice.selectedOptions).length > 0) {
+                filtre += "\tDiagnostice: ";
+                Array.from(diagnostice.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+                filtre += "\n";
+            }
+
+            if (Array.from(medicamente.selectedOptions).length > 0) {
+                filtre += "\tMedicamente: ";
+                Array.from(medicamente.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+                filtre += "\n";
+            }
+
+            if (Array.from(specializari.selectedOptions).length > 0) {
+                filtre += "\tSpecializari: ";
+                Array.from(specializari.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+                filtre += "\n";
+            }
+
+            if (Array.from(medici.selectedOptions).length > 0) {
+                filtre += "\tMedici: ";
+                Array.from(medici.selectedOptions).forEach(element => {
+                    filtre += element.text + ", ";
+                });
+            }
+
+            var props = {
+                outputType: jsPDFInvoiceTemplate.OutputType.DataUrlNewWindow,
+                returnJsPDFDocObject: true,
+                fileName: raportName.value,
+                orientationLandscape: true,
+                compress: true,
+                logo: {
+                    src: "../../../TRIOHELPVET A-N png.png",
+                    type: 'PNG',
+                    width: 50,
+                    height: 30,
+                    margin: {
+                        top: 0,
+                        left: 0
+                    }
+                },
+                stamp: {
+                    inAllPages: true,
+                    src: "../../../TRIOHELPVET A-N png.png",
+                    type: 'PNG',
+                    width: 30,
+                    height: 20,
+                    margin: {
+                        top: 0,
+                        left: 0
+                    }
+                },
+                business: {
+                    name: "TrioHelp Vet",
+                    address: "Strada Fetesti nr.2i, Bucuresti, Romania",
+                    phone: "(+40) 0772 071 759",
+                    email: "triohelpvet@gmail.com",
+                    website: "www.triohelp.vet",
+                },
+                contact: {
+                    label: " ",
+                    name: raportName.value,
+                    otherInfo: showGroupBy.checked ? "Grupare dupa: " + groupBy.options[groupBy.selectedIndex].value : ""
+                },
+                invoice: {
+                    label: "Elemente Gasite: ",
+                    num: matrix.length,
+                    invDate: "De la: " + (dateLocation.options[dateLocation.selectedIndex].value === "noDate" ? "-" : startDate.value),
+                    invGenDate: "Pana la: " + (dateLocation.options[dateLocation.selectedIndex].value === "noDate" ? "-" : endDate.value),
+                    headerBorder: true,
+                    tableBodyBorder: true,
+                    header: [
+                        // {
+                        //     title: "Grupare",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Aparitii",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Procentaj Esantion",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "P.T. Perioada",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Procentaj Total",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Val. Manopere",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Val. Medicamente",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        // {
+                        //     title: "Val. Totala",
+                        //     style: {
+                        //         fontSize: 14
+                        //     }
+                        // }
+                    ],
+                    table: Array.from(Array(matrix.length), (item, index) => {
+                        var row = [];
+
+                        row.push(matrix[index][0])
+
+                        ckC1.checked ? row.push(matrix[index][1]) : '';
+                        ckC2.checked ? row.push(matrix[index][2]) : '';
+                        ckC3.checked ? row.push(matrix[index][3]) : '';
+                        ckC4.checked ? row.push(matrix[index][4]) : '';
+                        ckC5.checked ? row.push(matrix[index][5]) : '';
+                        ckC6.checked ? row.push(matrix[index][6]) : '';
+                        ckC7.checked ? row.push(matrix[index][7]) : '';
+
+                        return row;
+                    }),
+                    invDescLabel: showFilters.checked ? "Filtre: " : "",
+                    invDesc: showFilters.checked ? filtre : "",
+                },
+                footer: {
+                    text: "Dedicated to Your Pet's Health and Happiness",
+                },
+                pageEnable: true,
+                pageLabel: "Page ",
+            };
+
+            props.invoice.header.push(
+                {
+                    title: "Grupare",
+                    style: {
+                        fontSize: 14
+                    }
+                });
+
+            ckC1.checked ? props.invoice.header.push(
+                {
+                    title: "Aparitii",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC2.checked ? props.invoice.header.push(
+                {
+                    title: "Procentaj Esantion",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC3.checked ? props.invoice.header.push(
+                {
+                    title: "P.T. Perioada",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC4.checked ? props.invoice.header.push(
+                {
+                    title: "Procentaj Total",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC5.checked ? props.invoice.header.push(
+                {
+                    title: "Val. Manopere",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC6.checked ? props.invoice.header.push(
+                {
+                    title: "Val. Medicamente",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+            ckC7.checked ? props.invoice.header.push(
+                {
+                    title: "Val. Totala",
+                    style: {
+                        fontSize: 14
+                    }
+                }) : '';
+
+            const pdfObject = jsPDFInvoiceTemplate.default(props);
+        }
+
+        function onLoad() {
+            let tbody = document.getElementById("tb");
+
+            Array.from(tbody.rows).forEach(row => {
+                if (row.id !== "total") {
+                    labels.push(row.cells[0].innerText);
+                    values.push(parseFloat(row.cells[1].innerText));
+                    valuesManopere.push(parseFloat(row.cells[5].innerText));
+                    valuesMedicamente.push(parseFloat(row.cells[6].innerText));
+                    valuesTotal.push(parseFloat(row.cells[7].innerText));
+                }
+            });
+
+            myPieChart.update();
+            myBarChart.update();
+
+        }
+        function request() {
+
+            var groupBy = document.getElementById("groupBy").value;
+            var rase = Array.from(document.getElementById("rase").selectedOptions).map(option => option.value);
+            var specii = Array.from(document.getElementById("specii").selectedOptions).map(option => option.value);
+            var diagnostice = Array.from(document.getElementById("diagnostice").selectedOptions).map(option => option.value);
+            var medicamente = Array.from(document.getElementById("medicamente").selectedOptions).map(option => option.value);
+            var specializari = Array.from(document.getElementById("specializari").selectedOptions).map(option => option.value);
+            var medici = Array.from(document.getElementById("medici").selectedOptions).map(option => option.value);
+            var dateLocation = document.getElementById("dateLocation").value;
+            var startDate = document.getElementsByName("startDate")[0].value;
+            var endDate = document.getElementsByName("endDate")[0].value;
+
+            fetch('/app/api/statistici', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    categorie: groupBy,
+                    rase: rase,
+                    specii: specii,
+                    diagnostice: diagnostice,
+                    medicamente: medicamente,
+                    specializari: specializari,
+                    medici: medici,
+                    dateLocation: dateLocation,
+                    startDate: startDate,
+                    endDate: endDate
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Request failed with status ' + response.status);
+                    }
+                })
+                .then(data => {
+
+                    let tbody = document.getElementById("tb");
+                    tb.innerText = "";
+
+                    var labels = [];
+                    var values = [];
+                    var valuesManopere = [];
+                    var valuesMedicamente = [];
+                    var valuesTotal = [];
+
+                    data.listaStatistici.forEach(element => {
+                        let tr = document.createElement("tr");
+                        let td = document.createElement("td");
+
+                        td.textContent = element.grupa
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = element.aparitie;
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = (element.procentajEsantion * 100).toFixed(2) + "%";
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = (element.procentajTotalPerioada * 100).toFixed(2) + "%";
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = (element.procentajTotal * 100).toFixed(2) + "%";
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = element.valoareManopere.toFixed(2) + "RON";
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = element.valoareTratamente.toFixed(2) + "RON";
+                        tr.appendChild(td);
+
+                        td = document.createElement("td")
+                        td.textContent = element.valoareTotala.toFixed(2) + "RON";
+                        tr.appendChild(td);
+
+                        tbody.appendChild(tr);
+
+                        labels.push(element.grupa);
+                        values.push(element.aparitie);
+                        valuesManopere.push(element.valoareManopere);
+                        valuesMedicamente.push(element.valoareMedicamente);
+                        valuesTotal.push(element.valoareTotala);
+                    });
+
+                    let tr = document.createElement("tr");
+
+                    tr.classList.add("nonDataRow");
+
+                    let td = document.createElement("td")
+                    td.textContent = "Total";
+                    td.classList.add("cellWithButton");
+                    let closeBtn = document.createElement("button");
+                    closeBtn.innerHTML = "&times;";
+                    closeBtn.id = "closeButton";
+                    closeBtn.classList.add("close-button");
+                    closeBtn.addEventListener("click", function () {
+                        deleteRow(closeBtn);
+                    });
+                    td.appendChild(closeBtn);
+                    tr.appendChild(td);
+
+                    countNoData = 1;
+
+                    td = document.createElement("td")
+                    td.textContent = data.aparitieSum;
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = (data.procentajEsantionSum * 100).toFixed(2) + "%";
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = (data.procentajTotalPerioadaSum * 100).toFixed(2) + "%";
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = (data.procentajTotalSum * 100).toFixed(2) + "%";
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = data.valoareManopereSum.toFixed(2) + "RON";
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = data.valoareTratamenteSum.toFixed(2) + "RON";
+                    tr.appendChild(td);
+
+                    td = document.createElement("td")
+                    td.textContent = data.valoareTotalaSum.toFixed(2) + "RON";
+                    tr.appendChild(td);
+
+                    totalRow = tr;
+
+                    tbody.appendChild(tr);
+
+                    myPieChart.data.labels = labels;
+                    myPieChart.data.datasets[0].data = values;
+                    myPieChart.update();
+
+                    myBarChart.data.labels = labels;
+                    myBarChart.data.datasets[0].data = values;
+                    myBarChart.update();
+
+                    myPieChartValManopere.data.labels = labels;
+                    myPieChartValManopere.data.datasets[0].data = valuesManopere;
+                    myPieChartValManopere.update();
+
+                    myBarChartValManopere.data.labels = labels;
+                    myBarChartValManopere.data.datasets[0].data = valuesManopere;
+                    myBarChartValManopere.update();
+
+                    myPieChartValMedicamente.data.labels = labels;
+                    myPieChartValMedicamente.data.datasets[0].data = valuesMedicamente;
+                    myPieChartValMedicamente.update();
+
+                    myBarChartValMedicamente.data.labels = labels;
+                    myBarChartValMedicamente.data.datasets[0].data = valuesMedicamente;
+                    myBarChartValMedicamente.update();
+
+                    myPieChartValTotal.data.labels = labels;
+                    myPieChartValTotal.data.datasets[0].data = valuesTotal;
+                    myPieChartValTotal.update();
+
+                    myBarChartValTotal.data.labels = labels;
+                    myBarChartValTotal.data.datasets[0].data = valuesTotal;
+                    myBarChartValTotal.update();
+
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        function updateCount(select, label) {
+            label.textContent = Array.from(select.selectedOptions).length;
+        }
+
+        const multiSelects = document.querySelectorAll('select[multiple]');
+
+        multiSelects.forEach(select => {
+            select.addEventListener('wheel', event => {
+                event.preventDefault();
+                select.scrollTop += event.deltaY * 0.4;
+            });
+        });
+
+        // const selectedOptionsMatrix = new Map();
+
+        // multiSelects.forEach(select => {
+        //     selectedOptionsMatrix.set(select, []);
+        // });
+
+        // // Event listener for click events on options
+        // multiSelects.forEach(select => {
+        //     select.addEventListener('click', event => {
+        //         const option = event.target;
+        //         const selectMatrix = selectedOptionsMatrix.get(select);
+        //         const index = selectMatrix.indexOf(option);
+
+        //         if (index === -1) {
+        //             selectMatrix.push(option);
+
+        //             selectMatrix.forEach(selectedOption => {
+        //                 selectedOption.selected = true;
+        //             });
+        //         } else {
+        //             selectMatrix.splice(index, 1);
+        //             option.selected = false;
+
+        //             selectMatrix.forEach(selectedOption => {
+        //                 selectedOption.selected = true;
+        //             });
+        //         }
+        //     });
+        // });
+
+    </script>
+
+</body>
+
+</html>
+
+<style>
+    .chartTitle {
+        z-index: 2;
+        padding-top: 10px;
+        margin-left: 50px;
+    }
+
+    .count_selected {
+        z-index: 2;
+        float: right;
+        margin-right: 5px;
+    }
+
+    .back-button {
+        z-index: 2;
+        float: right;
+        margin-bottom: 10px;
+    }
+
+    .charts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        margin: 1rem;
+    }
+
+    .pieChart,
+    .barChart {
+        width: 45%;
+        height: 400px;
+        margin: 1rem;
+        border: 1px solid #ccc;
+    }
+
+    .form-container {
+        width: 200px;
+        padding: 8px;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        position: fixed;
+    }
+
+    .form-container label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-container select,
+    .form-container input[type="date"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #c03812;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    .form-container input[type="submit"] {
+        background-color: #c03812;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: #c03812;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        float: right;
+    }
+
+    .form-container input[type="submit"]:hover {
+        background-color: #6f1903;
+    }
+
+    .table-container {
+        flex: 1;
+        margin-left: 230px;
+    }
+
+    .table-container table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 8px;
+        border: 1px solid #c03812;
+        text-align: left;
+    }
+
+    .nonDataRow td {
+        font-weight: bold;
+    }
+
+    .table-container th {
+        background-color: #c03812;
+        color: white;
+        font-weight: bold;
+    }
+
+    .table-container tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .dialogs input[type=text],
+    .dialogs input[type=number],
+    .dialogs input[type=checkbox],
+    .dialogs select,
+    .dialogs .password {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .dialogs input[type=submit] {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    /* .dialogs input[type=submit]:hover {
+        background-color: #45a049;
+    } */
+
+    .dialogs div {
+        margin: auto;
+        padding: 10px;
+        width: 25%;
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    .dialogs a {
+        display: flex;
+        color: rgb(0, 0, 0);
+    }
+
+    dialog {
+        width: 20%;
+        padding: 12px 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    dialog .close-button {
+        color: black;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+    }
+
+    select[multiple] {
+        height: calc(4 * 1.28em);
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+
+    select[multiple]::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    select[multiple]::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    select[multiple]::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .button-group h2 {
+        margin-bottom: 5px;
+    }
+
+    .button-group button {
+        margin-bottom: 5px;
+    }
+
+    .cellWithButton {
+        position: relative;
+    }
+
+    .cellWithButton .close-button {
+        position: absolute;
+        color: black;
+        top: 1px;
+        right: 1px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+    }
+</style>

@@ -2,7 +2,6 @@
 <html lang="en">
 
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link th:href="@{input.css}" rel="stylesheet" />
 
 <head>
     <meta charset="UTF-8">
@@ -10,21 +9,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 </head>
-    <body>
-        <div>
-            Login: <br><br>
-            <form  for="login" method="post">
 
-                <label for="userName">UserName:</label><br>
-                <input type="text" name="userName" placeholder="UserName"><br>
+<body>
+    <div>
+        Login: <br><br>
+        <form for="login" method="post">
 
-                <label for="password">Password:</label><br>
-                <input type="password" name="password" placeholder="Password" class="password"><br>
+            <label for="userName">UserName:</label><br>
+            <input type="text" name="userName" placeholder="UserName" th:value="${returnedUserName ?:''}"><br>
+            <span class="error" th:each="error : ${userNameErrors}" th:text="${error}"></span> <br>
 
-                <input type="submit" value="Submit"> 
-                <a href="./signin">SignIn</a>
+            <label for="password">Password:</label><br>
+            <input type="password" name="password" placeholder="Password" class="password"
+                th:value="${returnedPassword ?:''}"><br>
+            <span class="error" th:unless="${passwordErrors}" th:each="error : ${passwordErrors}"
+                th:text="${error}"></span><br>
 
-            </form>
-        </div>
-    </body>
+            <input type="submit" value="LogIn"> <br> <br>
+            <a href="./signin" style="float: left;">SignIn</a>
+            <a href="./app/medic/login" style="float: right;">LogIn As Medic</a>
+            <br>
+            <br>
+
+        </form>
+    </div>
+</body>
+<style>
+    .error {
+        color: red;
+    }
+
+    input[type=text], select, .password {
+    width:100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  input[type=submit] {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: #45a049;
+  }
+  
+  div {
+    margin: auto;
+    padding: 10px;
+    width: 25%;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+  }
+</style>
+
 </html>

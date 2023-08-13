@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        Tratament: <br><br>
+        <form method="post" id="form-tratament">
+
+            <label for="pretManopera">PretManopera</label>
+            <input type="number" name="pretManopera"><br>
+
+            <label for="medicamente">Medicamente:</label>
+            <select name="medicamente" id="medicamente" multiple></select><br>
+
+            <select id="select-medicament">
+                <option th:text="${medicament.numeMedicament}" th:value="${medicament.id}"
+                    th:each="medicament : ${medicamente}"></option>
+            </select>
+
+            <input type="button" onclick="addMedicament()" value="Add Medicament"><br>
+
+            <textarea style="display: none;" name="listaMedicamente" id="listaMedicamente"></textarea><br>
+
+            <input type="submit">
+
+        </form>
+    </div>
+</body>
+
+</html>
+
+<script th:inline="javascript">
+    function addMedicament() {
+        let newMedicament = document.getElementById("select-medicament");
+        let medicamente = document.getElementById("medicamente");
+
+        let option = document.createElement("option");
+        option.text = newMedicament.options[newMedicament.selectedIndex].text;
+        option.value = newMedicament.value;
+
+        var textArea = document.getElementById("listaMedicamente");
+        textArea.value = textArea.value + newMedicament.value + ";";
+
+        medicamente.add(option);
+
+    }
+</script>
+
+<style>
+    input[type=text],
+    input[type=number],
+    input[type=date],
+    select,
+    .password {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type=submit],
+    input[type=button] {
+        width: 100%;
+        background-color: #117faa;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+        background-color: #046288;
+    }
+
+    input[type=button]:hover {
+        background-color: #046288;
+    }
+
+    div {
+        margin: auto;
+        padding: 10px;
+        width: 25%;
+        border-radius: 5px;
+        background-color: #f2f2f2;
+        padding: 20px;
+    }
+
+    a {
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        background-color: #117faa;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>

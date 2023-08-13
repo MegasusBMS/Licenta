@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%">
+        <button th:onclick="|window.location.href='@{'../../../app/logout'}'|" style="float: right; z-index: 2; margin-right: 5px; margin-top: 25px;"> Logout</button>
+        <h3 class="w3-bar-item">Administrator</h3>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/medici'}'|">Medici</span>
+        </div>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/animale'}'|">Animale</span>
+        </div>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/diagnostice'}'|">Diagnostice</span>
+        </div>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/medicamente'}'|">Medicamente</span>
+        </div>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/tratamente'}'|">Tratamente</span>
+        </div>
+        <div class="w3-bar-item w3-button">
+            <span th:onclick="|window.location.href='@{'/app/admin/utilizatori'}'|">Utilizatori</span>
+        </div>
+    </div>
+    <div id="details" class="w3-container" style="margin-left:25%">
+        <div th:if="${not #lists.isEmpty(medici)}">
+            <h3>Medici</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>IdParafa</th>
+                        <th>Nume</th>
+                        <th>Specializare</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="medic : ${medici}">
+                        <td th:text="${medic.idParafa}"></td>
+                        <td th:text="${medic.fullName}"></td>
+                        <td th:text="${medic.specializare}"></td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/medic/' + ${medic.id}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/medici/' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/medici/' + ${page - 1}}">←</a>
+                <a class="add-button" th:href="@{'/app/admin/add/medic'}">Adaugă Medic</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/medici/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/medici/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(animale)}">
+            <h3>Animale</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Animal</th>
+                        <th>Stăpân</th>
+                        <th>Vârsta</th>
+                        <th>DataNastere</th>
+                        <th>Categorie Animal</th>
+                        <th>Rasă Animal</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="animal : ${animale}">
+                        <td th:text="${animal.numeAnimal}"></td>
+                        <td th:text="${animal.numeStapan}"></td>
+                        <td th:text="${animal.varstaAnimal}"></td>
+                        <td th:text="${animal.dataNastere}"></td>
+                        <td th:text="${animal.categorieAnimal}"></td>
+                        <td th:text="${animal.rasaAnimal}"></td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/animal/' + ${animal.id}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/animale/' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/animale/' + ${page - 1}}">←</a>
+                <a class="add-button" th:href="@{'/app/admin/add/animal'}">Adaugă Animal</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/animale/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/animale/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(medicamente)}">
+            <h3>Medicamente</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Medicament</th>
+                        <th>Categorie Medicament</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="medicament : ${medicamente}">
+                        <td th:text="${medicament.numeMedicament}"></td>
+                        <td th:text="${medicament.categorieMedicament}"></td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/medicament/' + ${medicament.id}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/medicamente' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/medicamente/' + ${page - 1}}">←</a>
+                <a class="add-button" th:href="@{'/app/admin/add/medicament'}">Adaugă Medicament</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/medicamente/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/medicamente/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(tratamente)}">
+            <h3>Tratamente</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Medic</th>
+                        <th>Nume Animal</th>
+                        <th>Medicamente</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tratament : ${tratamente}">
+                        <td th:text="${tratament.numeMedic}"></td>
+                        <td th:text="${tratament.numeAnimal}"></td>
+                        <td>
+                            <ul style="overflow-y: scroll; max-height:90px">
+                                <li th:each="medicament : ${tratament.medicamente}" th:text="${medicament}"></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/tratament/' + ${tratament.id}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/tratamente/' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/tratamente/' + ${page - 1}}">←</a>
+                <a class="add-button" th:href="@{'/app/admin/add/tratament'}">Adaugă Tratament</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/tratamente/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/tratamente/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(diagnostice)}">
+            <h3>Diagnostice</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Animal</th>
+                        <th>Diagnostic</th>
+                        <th>Categorie Diagnostic</th>
+                        <th>Data Diagnostic</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="diagnostic : ${diagnostice}">
+                        <td th:text="${diagnostic.numeAnimal}"></td>
+                        <td th:text="${diagnostic.numeDiagnostic}"></td>
+                        <td th:text="${diagnostic.categorieDiagnostic}"></td>
+                        <td th:text="${diagnostic.dataDiagnostic}"></td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/diagnostic/' + ${diagnostic.id}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/diagnostice/' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/diagnostice/' + ${page - 1}}">←</a>
+                <a class="add-button" th:href="@{'/app/admin/add/diagnostic'}">Adaugă Diagnostic</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/diagnostice/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/diagnostice/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+        <div th:if="${not #lists.isEmpty(utilizatori)}">
+            <h3>Utilizatori</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nume Utilizator</th>
+                        <th>Cnp</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="utilizator : ${utilizatori}">
+                        <td th:text="${utilizator.userName}"></td>
+                        <td th:text="${utilizator.cnp}"></td>
+                        <td>
+                            <button class="edit-button"
+                                th:onclick="|window.location.href='@{'/app/admin/edit/utilizator/' + ${utilizator.UUID}}'|">Editează</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="table-actions">
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/utilizatori/' + 0}">⇤</a>
+                <a class="add-button" th:if="${page} > 0" th:href="@{'/app/admin/utilizatori/' + ${page - 1}}">←</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/utilizatori/' + ${page + 1}}">→</a>
+                <a class="add-button" th:if="${maxPage -1} > ${page}"
+                    th:href="@{'/app/admin/utilizatori/' + ${maxPage -1}}">⇥</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<style>
+    .table-actions {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+    }
+
+    .add-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .edit-button,
+    .delete-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 5px;
+    }
+
+    .edit-button:hover,
+    .delete-button:hover {
+        background-color: #3e8e41;
+    }
+
+    h3 {
+        padding: 9px;
+        text-align: center;
+        background: #0640e1;
+        color: white;
+        font-size: 30px;
+    }
+</style>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="output-box">
+            <div class="card">
+                <button th:onclick="|window.location.href='@{'../../' + ${animal.id}}'|"
+                style="margin-bottom: 5px; float: right; z-index: 2;">Back</button>
+                <div class="card-header">Detalii Animal</div>
+                <div class="card-row">
+                    <div class="card-label">Nume Animal:</div>
+                    <div class="card-value" th:text="${animal.numeAnimal}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Specie:</div>
+                    <div class="card-value" th:text="${animal.rasa.categorieAnimal.numeCategorie}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Rasa:</div>
+                    <div class="card-value" th:text="${animal.rasa.numeRasa}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Data Nastere:</div>
+                    <div class="card-value" th:text="${#dates.format(animal.dataNastere, 'yyyy-MM-dd')}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Nume Stapan:</div>
+                    <div class="card-value" th:text="${animal.stapan.userName}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">CNP Stapan:</div>
+                    <div class="card-value" th:text="${animal.stapan.cnp}"></div>
+                </div>
+                <br>
+                <br>
+                <button style="margin-bottom: 10px;"
+                    th:onclick="|window.location.href='@{'/app/medic/animal/' + ${animal.id} + '/diagnostic/' + ${diagnostic.id} + '/fisaDiagnostic'}'|">Fisa
+                    Diagnostic</button>
+                <button
+                    th:onclick="|window.location.href='@{'/app/medic/animal/' + ${animal.id} + '/diagnostic/' + ${diagnostic.id} + '/addTratament'}'|">Add
+                    Tratament</button>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="title" th:text="@{'Diagnostic: ' + ${diagnostic.numeDiagnostic}}"></div>
+
+        <table>
+                <th> Nume Medic </th>
+                <th> Data Tratament </th>
+                <th> Medicamente </th>
+            <tbody>
+                <tr th:each="tratament : ${diagnostic.tratamente}" class="row"
+                    th:onclick="|window.location.href='@{'/app/medic/animal/'+${animal.id}+'/diagnostic/' + ${diagnostic.id} +'/tratament/' + ${tratament.id} + '/fisaTratament'}'|">
+                    <td th:text="${tratament.medic.fullName}"></td>
+                    <td th:text="${#dates.format(tratament.dataTratament, 'yyyy-MM-dd')}"></td>
+                    <td>
+                        <table>
+                            <tr th:each="element : ${tratament.medicamente}">
+                                <td th:text="${element.medicament.nume}"></td>
+                                <td th:text="${element.medicament.categorieMedicament.numeCategorieMedicament}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
+
+<style>
+    table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: 10px;
+        margin-top: 5%;
+    }
+
+    th,
+    td {
+        white-space: nowrap;
+        padding: 10px;
+        text-align: left;
+        border: 1px solid black;
+    }
+
+    th {
+        background-color: #117faa;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: lightblue;
+    }
+
+    tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    .card {
+        width: 300px;
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-left: 50px;
+        background-color: #f7f7f7;
+    }
+
+    .card-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .card-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .card-label {
+        font-weight: bold;
+        width: 120px;
+        color: #666;
+    }
+
+    .card-value {
+        flex-grow: 1;
+        color: #333;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        display: flex;
+        margin-top: 2px;
+        width: 400px;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .output-box {
+        margin-bottom: 10px;
+    }
+
+    button {
+        background-color: #117faa;
+        color: white;
+        padding: 10px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .row:hover {
+        transform: scale(1.01);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    button:hover {
+        background-color: #046288;
+    }
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 25px;
+        padding-top: 100px;
+        color: #333;
+    }
+</style>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="search-container">
+            <form method="post">
+                <input type="button" value="Add Animal" th:onclick="|window.location.href='@{'/app/medic/addAnimal'}'|"
+                    class="search-button">
+                <input type="text" class="search-input" id="search" name="search" placeholder="Search...">
+                <select class="search-select" name="searchBy" id="searchSelect" onchange="searchSelectChanged()">
+                    <option value="byAnimalName">byAnimalName</option>
+                    <option value="byCNP">byCNP</option>
+                    <option value="byUserName">byUserName</option>
+                </select>
+                <input type="submit" class="search-button" value="Search">
+                <input type="button" value="Statistici Animale"
+                    th:onclick="|window.location.href='@{'/app/statistici'}'|" class="search-button">
+                <input type="button" style="float: right; margin-right: 20px;" value="Logout"
+                    th:onclick="|window.location.href='@{'/app/medic/logout'}'|" class="search-button">
+            </form>
+        </div>
+        <div class="user-box" id="userBox">
+            <label for="numeMedic">Nume Medic:</label>
+            <h4 name="numeMedic" th:text="${medic.nume}"></h4>
+            <label for="idParafa">Id Parafa:</label>
+            <h4 name="idParafa" th:text="${medic.parafa}"></h4>
+            <label for="specializare">Specializare:</label>
+            <h4 name="specializare" th:text="${medic.specializare}"></h4>
+        </div>
+        <div class="scrollable-div">
+            <ul class="animal-list">
+                <li th:each="animal : ${animale}"
+                    th:onclick="|window.location.href='@{'/app/medic/animal/' + ${animal.id}}'|" class="animal-item">
+                    <div class="animal-details">
+                        <div class="animal-name" th:text="${animal.numeAnimal}"></div>
+                        <div class="animal-species" th:text="${animal.rasa.categorieAnimal.numeCategorie}"></div>
+                        <div class="animal-breed" th:text="${animal.rasa.numeRasa}"></div>
+                        <div class="animal-owner">
+                            <span class="owner-label">NumeStapan:</span>
+                            <span class="owner-name" th:text="${animal.stapan.userName}"></span>
+                        </div>
+                        <div class="animal-owner">
+                            <span class="owner-label">Cnp:</span>
+                            <span class="owner-cnp" th:text="${animal.stapan.cnp}"></span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="button-container">
+            <div class="left-buttons">
+                <button class="bottom-button search-button" th:if="${page > 0}"
+                    th:onclick="|window.location.href = '/app/medic/' + 0|">⇤</button>
+
+                <button class="bottom-button search-button" th:if="${page > 0}"
+                    th:onclick="|window.location.href = '/app/medic/' + ${page - 1}|">←</button>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="right-buttons">
+                <button class="bottom-button search-button" th:if="${maxPage - 1 > page}"
+                    th:onclick="|window.location.href = '/app/medic/' + ${page + 1}|">→</button>
+
+                <button class="bottom-button search-button" th:if="${maxPage - 1 > page}"
+                    th:onclick="|window.location.href = '/app/medic/' + ${maxPage - 1}|">⇥</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    function searchSelectChanged() {
+        let searchSelect = document.getElementById("searchSelect");
+        let searchBar = document.getElementById("search");
+        searchBar.text = "";
+        if (searchSelect.value === "byCNP")
+            searchBar.type = "number";
+        else
+            searchBar.type = "text";
+    }
+</script>
+
+<style>
+    .scrollable-div {
+        margin-left: 18%;
+        margin-top: 10%;
+        max-height: 100%;
+        width: 100%;
+        overflow-y: scroll;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+
+    .scrollable-div::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollable-div::-webkit-scrollbar-thumb {
+        background-color: transparent;
+    }
+
+    .scrollable-div::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    .button-container {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .left-buttons,
+    .right-buttons {
+        display: flex;
+        align-items: center;
+    }
+
+    .spacer {
+        flex-grow: 1;
+    }
+
+    .bottom-button {
+        width: 50px;
+        height: 50px;
+        margin: 0 5px;
+    }
+
+    .animal-list {
+        list-style-type: none;
+        width: 80%;
+        opacity: 0.8;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .animal-item {
+        flex: 0 0 100%;
+        box-sizing: border-box;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 4px;
+        background-color: #f8f8f8;
+        transition: background-color 0.3s ease;
+    }
+
+    .animal-item:hover {
+        background-color: #e0e0e0;
+    }
+
+    .animal-details {
+        display: flex;
+        flex-direction: column;
+        opacity: 1.0;
+    }
+
+    .animal-name {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .animal-species {
+        text-align: center;
+        color: #666;
+    }
+
+    .animal-breed {
+        text-align: center;
+        color: #888;
+    }
+
+    .animal-owner {
+        display: flex;
+        align-items: center;
+    }
+
+    .owner-label {
+        font-weight: bold;
+    }
+
+    .owner-name {
+        margin-left: 5px;
+    }
+
+    .owner-cnp {
+        font-family: monospace;
+    }
+
+    table {
+        width: 80%;
+        border-collapse: collapse;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 5%;
+    }
+
+    th,
+    td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #333;
+    }
+
+    th {
+        background-color: #117faa;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: lightblue;
+    }
+
+    tr:nth-child(odd) {
+        background-color: white;
+    }
+
+    .search-select {
+        background-color: #117faa;
+        color: white;
+        font-weight: bold;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        margin-top: 10px;
+    }
+
+    body,
+    html {
+        height: 100%;
+        margin: 0;
+    }
+
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        position: relative;
+    }
+
+    .search-container {
+        text-align: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+    }
+
+    .search-input {
+        padding: 10px;
+        width: 300px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .search-button {
+        padding: 10px 20px;
+        margin-top: 10px;
+        background-color: #117faa;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .search-button:hover {
+        background-color: #046288;
+    }
+
+    .row:hover {
+        transform: scale(1.01);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    body {
+        background-image: url("../../bg.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .user-box {
+        width: 200px;
+        height: auto;
+        background-color: lightgray;
+        position: fixed;
+        top: 23%;
+        right: 20px;
+        transform: translateY(-50%);
+        padding: 10px;
+        text-align: center;
+        font-size: 18px;
+    }
+</style>

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container2">
+        <div class="box2">
+            <div class="card">
+                <div class="card-header">Detalii Animal</div>
+                <div class="card-row">
+                    <div class="card-label">Nume Animal:</div>
+                    <div class="card-value" th:text="${animal.numeAnimal}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Specie:</div>
+                    <div class="card-value" th:text="${animal.rasa.categorieAnimal.numeCategorie}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Rasa:</div>
+                    <div class="card-value" th:text="${animal.rasa.numeRasa}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Data Nastere:</div>
+                    <div class="card-value" th:text="${#dates.format(animal.dataNastere, 'yyyy-MM-dd')}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">Nume Stapan:</div>
+                    <div class="card-value" th:text="${animal.stapan.userName}"></div>
+                </div>
+                <div class="card-row">
+                    <div class="card-label">CNP Stapan:</div>
+                    <div class="card-value" th:text="${animal.stapan.cnp}"></div>
+                </div>
+            </div>
+        </div>
+        <div class="box2">
+            <div class="title">Fisa Medicala</div>
+        </div>
+        <div class="box2">
+            <div class="button-group card" style="float: right; margin-right: 50px;">
+                <div class="card-header"></div>
+                <button th:onclick="|window.location.href = '@{'../' + ${animal.id}}';|"
+                    class="back-button">Back</button>
+                <button onclick="pdf()" class="back-button">Save as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="section-header">Diagnostice</div>
+        <div class="nested-box" id="diagnostice" th:each="diagnostic : ${animal.diagnostice}">
+            <div class="row">
+                <div class="label">Diagnostic:</div>
+                <div class="value" id="numeDiagnostic" th:text="${diagnostic.numeDiagnostic}"></div>
+            </div>
+            <div class="row">
+                <div class="label">Data Diagnostic:</div>
+                <div class="value" id="dataDiagnostic"
+                    th:text="${#dates.format(diagnostic.dataDiagnostic, 'yyyy-MM-dd')}"></div>
+            </div>
+            <div class="row">
+                <div class="label">Specificatii:</div>
+                <div class="value" id="specDiagnostic" th:text="${diagnostic.specificatiiDiagnostic}"></div>
+            </div>
+            <div class="row">
+                <div class="label">Treatmente:</div><br>
+            </div>
+            <div class="row" id="tratamente" th:each="tratament : ${diagnostic.tratamente}">
+                <div class="value">
+                    <div class="nested-box">
+                        <div class="row">
+                            <div class="label">Nume Medic:</div>
+                            <div class="value" id="medicTratament" th:text="${tratament.medic.fullName}"></div>
+                        </div>
+                        <div class="row">
+                            <div class="label">Data:</div>
+                            <div class="value" id="dataTratament"
+                                th:text="${#dates.format(tratament.dataTratament, 'yyyy-MM-dd')}"></div>
+                        </div>
+                        <div class="row">
+                            <div class="label">Medicamente:</div><br>
+                        </div>
+                        <div class="row">
+                            <div class="value">
+                                <div class="nested-box">
+                                    <div class="value" id="medicamente" th:each="element : ${tratament.medicamente}"
+                                        th:text="${element.medicament.nume} + ' - ' + ${element.medicament.categorieMedicament.numeCategorieMedicament}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+
+        const imageUrl = 'http://localhost:8080/img.png';
+        var diagnostice = document.querySelectorAll("#diagnostice");
+        var imageDataUrl;
+
+        fetch(imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const fileReader = new FileReader();
+                fileReader.onload = () => {
+                    imageDataUrl = fileReader.result;
+                };
+                fileReader.readAsDataURL(blob);
+            })
+            .catch(error => {
+                console.error('Error fetching image:', error);
+            });
+
+        function pdf() {
+
+            //let pdfDiagnostice = [];
+            let pdfDiagnostice = [];
+
+            var counter = 0;
+            var listaDiagnostice = [];
+
+            diagnostice.forEach(diagnostic => {
+
+                counter++;
+                let tratamente = diagnostic.querySelectorAll("#tratamente");
+                let mainLista = [];
+                let stack = [];
+                stack.push({
+                    text: 'Diagnostic' + counter + ': ',
+                    bold: true,
+                    wordSpacing: 15,
+                    margin: [0, 5]
+                })
+                mainLista.push({
+                    text: 'NumeDiagnostic: ' + diagnostic.querySelectorAll("#numeDiagnostic")[0].innerText + '\n' +
+                        'Data Diagnostic: ' + diagnostic.querySelectorAll("#dataDiagnostic")[0].innerText + '\n' +
+                        'Specificatii: ' + diagnostic.querySelectorAll("#specDiagnostic")[0].innerText,
+                    layout: 'noBorders',
+                    wordSpacing: 15,
+                    margin: [10, 0]
+                });
+
+                tratamente.forEach(tratament => {
+
+                    let medicamente = tratament.querySelectorAll("#medicamente");
+                    let listaMedicamente = [];
+                    let listaElemente = [];
+
+                    medicamente.forEach(medicament => {
+
+                        listaMedicamente.push(medicament.innerText);
+                    });
+
+                    let tratamentData = {
+                        text: 'Nume Medic: ' + tratament.querySelectorAll("#medicTratament")[0].innerText + '\n' +
+                            'Data Tratament: ' + tratament.querySelectorAll("#dataTratament")[0].innerText + '\n' +
+                            'Medicamente: ',
+                        layout: 'noBorders',
+                        wordSpacing: 15,
+                        margin: [10, 0]
+                    };
+                    listaElemente.push(tratamentData);
+                    listaElemente.push({
+                        ol: listaMedicamente,
+                        wordSpacing: 15,
+                        layout: 'noBorders',
+                        margin: [20, 0]
+                    });
+                    mainLista.push({
+                        ul: listaElemente,
+                        layout: 'noBorders',
+                        margin: [0, 10]
+                    });
+                });
+
+                stack.push({
+                    ul: mainLista,
+                    layout: 'noBorders',
+                    margin: [0, 10]
+                })
+
+                pdfDiagnostice.push({
+                    stack: stack,
+                    layout: 'noBorders',
+                    margin: [0, 10]
+                })
+            });
+
+
+            const docDefinition = {
+                content: [
+                    {
+                        layout: {
+                            hLineWidth: function (i) {
+                                return 0;
+                            },
+                            vLineWidth: function (i) {
+                                return 0;
+                            }
+                        },
+                        table: {
+                            widths: [50, '*', 'auto'],
+                            body: [
+                                [
+                                    {
+                                        image: imageDataUrl,
+                                        width: 80,
+                                        height: 75
+                                    },
+                                    {
+                                        text: 'Fisa Medicala',
+                                        fontSize: 16,
+                                        bold: true,
+                                        alignment: 'center',
+                                        margin: [0, 20]
+                                    },
+                                    {
+                                        text: [
+                                            { text: 'TrioHelp Vet\n', bold: true, fontSize: 14 },
+                                            { text: 'Strada Fetesti nr.2i, Bucuresti, Romania\n', fontSize: 11, color: '#606060' },
+                                            { text: '(+40) 0772 071 759\n', fontSize: 11, color: '#606060', color: '#606060' },
+                                            { text: 'triohelpvet@gmail.com\n', fontSize: 11, color: '#606060' },
+                                            { text: 'www.triohelp.vet\n', fontSize: 11, color: '#606060' },
+                                        ],
+                                        borderColor: 'transparent',
+                                        alignment: 'right'
+                                    }
+                                ]
+                            ],
+                            borderColor: 'transparent'
+                        }
+                    },
+                    {
+                        canvas: [
+                            {
+                                type: 'line',
+                                x1: 0,
+                                y1: 0,
+                                x2: 600,
+                                y2: 0,
+                                lineWidth: 1
+                            }
+                        ],
+                        margin: [0, 10]
+                    },
+                    {
+                        table: {
+                            widths: ['75%', '25%'],
+                            body: [
+                                [
+                                    {
+                                        text: [
+                                            { text: 'NumeClient: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${animal.stapan.userName}]]*/'', fontSize: 11, color: '#606060' },
+                                            { text: '\nCnpClient: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${animal.stapan.cnp}]]*/'', fontSize: 11, color: '#606060' },
+                                        ],
+                                        border: [false, false, false, false],
+                                        fontSize: 12,
+                                        bold: true,
+                                        alignment: 'justify',
+                                        margin: [0, 5]
+                                    },
+                                    {
+                                        text: [
+                                            { text: 'NumeAnimal: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${animal.numeAnimal}]]*/'', fontSize: 11, color: '#606060' },
+                                            { text: '\nSpecie: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${animal.rasa.categorieAnimal.numeCategorie}]]*/'', fontSize: 11, color: '#606060' },
+                                            { text: '\nRasa: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${animal.rasa.numeRasa}]]*/'', fontSize: 11, color: '#606060' },
+                                            { text: '\nDataN: ', fontSize: 11, color: '#606060' },
+                                            { text: /*[[${#dates.format(animal.dataNastere, 'yyyy-MM-dd')}]]*/'', fontSize: 11, color: '#606060' },
+                                        ],
+                                        border: [false, false, false, false],
+                                        fontSize: 12,
+                                        bold: true,
+                                        alignment: 'justify',
+                                        margin: [0, 5]
+                                    }
+                                ]
+                            ]
+                        },
+                        layout: {
+                            defaultBorder: false
+                        },
+                        margin: [0, 10]
+                    },
+                    {
+                        ul: pdfDiagnostice,
+                        layout: 'noBorders',
+                        margin: [0, 10]
+                    }
+                ]
+            };
+            pdfMake.createPdf(docDefinition).open();
+        }
+    </script>
+
+</body>
+
+</html>
+
+<style>
+    .button-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card {
+        width: 300px;
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-left: 50px;
+        background-color: #f7f7f7;
+    }
+
+    .card-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .card-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .card-label {
+        font-weight: bold;
+        width: 120px;
+        color: #666;
+    }
+
+    .card-value {
+        flex-grow: 1;
+        color: #333;
+    }
+
+    .container {
+        width: 400px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+    }
+
+    .box {
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-right: 50px;
+        margin-left: 50px;
+        background-color: #f7f7f7;
+    }
+
+    .section-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .label {
+        font-weight: bold;
+        width: 120px;
+        color: #666;
+    }
+
+    .value {
+        flex-grow: 1;
+        color: #333;
+    }
+
+    .list {
+        list-style-type: disc;
+        margin-left: 16px;
+        margin-top: 4px;
+        color: #333;
+    }
+
+    .nested-box {
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 8px;
+        margin-top: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f7f7f7;
+    }
+
+    .container2 {
+        display: flex;
+    }
+
+    .box2 {
+        flex: 1;
+        padding: 10px;
+        width: 30%;
+    }
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 25px;
+        padding-top: 100px;
+        color: #333;
+    }
+
+    .back-button {
+        padding: 10px 20px;
+        margin-top: 10px;
+        background-color: #117faa;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .back-button:hover {
+        background-color: #046288;
+    }
+</style>

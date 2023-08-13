@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="w3-sidebar w3-light-grey w3-bar-block" style="width:25%;">
+        <button th:onclick="|window.location.href='@{'../app/logout'}'|" style="float: right; z-index: 2; margin-right: 5px; margin-top: 25px;"> Logout</button>
+        <h3 class="w3-bar-item" th:text="${stapan}"></h3>
+        <input type="text" id="searchBar" onkeyup="searchBarEvent()" placeholder="Filter...">
+        <div id="animale">
+            <tdiv th:each="animal : ${animals}" class="w3-bar-item w3-button"
+                th:onclick="|window.location.href='@{'/app/' + ${animal.id}}'|">
+                <a th:text="${animal.nume}">
+                </a>
+            </tdiv>
+        </div>
+    </div>
+    <div id="details" class="w3-container" style="margin-left:25%;">
+        <div class="container2" th:if="${animal != null}">
+            <div>
+                <div class="card">
+                    <div class="card-header">Detalii Animal</div>
+                    <div class="card-row">
+                        <div class="card-label">Nume Animal:</div>
+                        <div class="card-value" th:text="${animal.numeAnimal}"></div>
+                    </div>
+                    <div class="card-row">
+                        <div class="card-label">Specie:</div>
+                        <div class="card-value" th:text="${animal.rasa.categorieAnimal.numeCategorie}"></div>
+                    </div>
+                    <div class="card-row">
+                        <div class="card-label">Rasa:</div>
+                        <div class="card-value" th:text="${animal.rasa.numeRasa}"></div>
+                    </div>
+                    <div class="card-row">
+                        <div class="card-label">Data Nastere:</div>
+                        <div class="card-value" th:text="${#dates.format(animal.dataNastere, 'yyyy-MM-dd')}"></div>
+                    </div>
+                    <div class="card-row">
+                        <div class="card-label">Nume Stapan:</div>
+                        <div class="card-value" th:text="${animal.stapan.userName}"></div>
+                    </div>
+                    <div class="card-row">
+                        <div class="card-label">CNP Stapan:</div>
+                        <div class="card-value" th:text="${animal.stapan.cnp}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="box2">
+                <div class="title card">Fisa Medicala</div>
+            </div>
+            <div class="box2"></div>
+        </div>
+
+        <div class="box" th:if="${animal != null}">
+            <div class="section-header">Diagnostice</div>
+            <div class="nested-box" th:each="diagnostic : ${animal.diagnostice}">
+                <div class="row">
+                    <div class="label">Diagnostic:</div>
+                    <div class="value" th:text="${diagnostic.numeDiagnostic}"></div>
+                </div>
+                <div class="row">
+                    <div class="label">Data:</div>
+                    <div class="value" th:text="${#dates.format(diagnostic.dataDiagnostic, 'yyyy-MM-dd')}"></div>
+                </div>
+                <div class="row">
+                    <div class="label">Specificatii:</div>
+                    <div class="value" th:text="${diagnostic.specificatiiDiagnostic}"></div>
+                </div>
+                <div class="row">
+                    <div class="label">Treatmente:</div><br>
+                </div>
+                <div class="row" th:each="tratament : ${diagnostic.tratamente}">
+                    <div class="value">
+                        <div class="nested-box">
+                            <div class="row">
+                                <div class="label">Nume Medic:</div>
+                                <div class="value" th:text="${tratament.medic.fullName}"></div>
+                            </div>
+                            <div class="row">
+                                <div class="label">Data:</div>
+                                <div class="value" th:text="${#dates.format(tratament.dataTratament, 'yyyy-MM-dd')}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="label">PretManopera:</div>
+                                <div class="value" th:text="@{${tratament.pretManopera}+'RON'}"></div>
+                            </div>
+                            <div class="row">
+                                <div class="label">Medicamente:</div><br>
+                            </div>
+                            <div class="row">
+                                <div class="value">
+                                    <div class="nested-box">
+                                        <div class="value" th:each="element : ${tratament.medicamente}">
+                                            <div th:with="medicamentPrice=${element.medicament.pret}">
+                                                <span
+                                                    th:text="${element.medicament.nume} + ' - ' + ${element.medicament.categorieMedicament.numeCategorieMedicament} + ': ' + ${element.medicament.pret} + 'RON'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<style>
+    .card {
+        width: 300px;
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-left: 50px;
+        background-color: #f7f7f7;
+    }
+
+    .card-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .card-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .card-label {
+        font-weight: bold;
+        width: 120px;
+        color: #666;
+    }
+
+    .card-value {
+        flex-grow: 1;
+        color: #333;
+    }
+
+    .container {
+        width: 400px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+    }
+
+    .box {
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-right: 50px;
+        margin-left: 50px;
+        background-color: #f7f7f7;
+    }
+
+    .section-header {
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 18px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .label {
+        font-weight: bold;
+        width: 120px;
+        color: #666;
+    }
+
+    .value {
+        flex-grow: 1;
+        color: #333;
+        margin-left: 4px;
+    }
+
+    .list {
+        list-style-type: disc;
+        margin-left: 16px;
+        margin-top: 4px;
+        color: #333;
+    }
+
+    .nested-box {
+        border: 1px solid #e1e1e1;
+        border-radius: 10px;
+        padding: 8px;
+        margin-top: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f7f7f7;
+    }
+
+    .container2 {
+        display: flex;
+    }
+
+    .box2 {
+        flex: 1;
+        padding: 10px;
+        width: 30%;
+    }
+
+    .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 25px;
+        color: #333;
+    }
+
+    #searchBar {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    #searchBar:focus {
+        outline: none;
+        border-color: #ffa600;
+    }
+
+    body {
+        background-image: url("../bg.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    div.w3-sidebar {
+        opacity: 0.5;
+    }
+
+    div.card {
+        opacity: 0.9;
+    }
+</style>
+
+<script th:inline="javascript">
+
+    var animals = /*[[${animals}]]*/ '';
+
+    function searchBarEvent() {
+
+        var searchBar = document.getElementById("searchBar");
+        var listaAnimale = document.getElementById("animale");
+
+        listaAnimale.innerHTML = "";
+
+        animals.forEach(animal => {
+
+            if (animal.nume.toLowerCase().includes(searchBar.value.toLowerCase())) {
+
+                var div = document.createElement("div");
+
+                div.className += " w3-bar-item w3-button";
+                div.onclick = function () {
+                    window.location.href = "/app/" + animal.id;
+                };
+
+
+                var a = document.createElement("a");
+                a.textContent = animal.nume;
+
+                div.appendChild(a);
+                listaAnimale.appendChild(div);
+
+            }
+        });
+    }
+
+</script>
